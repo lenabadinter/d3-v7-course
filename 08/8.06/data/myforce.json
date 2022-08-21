@@ -1,0 +1,22 @@
+{
+  "nodes": [
+    {"id": "Lena", "group": 1},
+    {"id": "Arkasha", "group": 1},
+    {"id": "Michal", "group": 1},
+    {"id": "Mama", "group": 2},
+    {"id": "Papa", "group": 2},
+    {"id": "Zila", "group": 3},
+    {"id": "Petya", "group": 3}
+  ],
+  "links": [
+    {"source": "Lena", "target": "Arkasha", "value": 1},
+    {"source": "Michal", "target": "Arkasha", "value": 8},
+    {"source": "Michal", "target": "Lena", "value": 10},
+    {"source": "Lena", "target": "Zila", "value": 6},
+    {"source": "Lena", "target": "Mama", "value": 1},
+    {"source": "Lena", "target": "Papa", "value": 1},
+    {"source": "Arkasha", "target": "Petya", "value": 1},
+    {"source": "Zila", "target": "Petya", "value": 1},
+    {"source": "Mama", "target": "Papa", "value": 2}
+  ]
+}

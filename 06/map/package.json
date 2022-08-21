@@ -1,0 +1,14 @@
+{
+  "name": "4ba36824644e4b07",
+  "main": "4ba36824644e4b07@662.js",
+  "version": "662.0.0",
+  "homepage": "https://observablehq.com/d/4ba36824644e4b07",
+  "author": {
+    "name": "Lena Badinter",
+    "url": "https://observablehq.com/@lena-badinter"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4"
+  }
+}

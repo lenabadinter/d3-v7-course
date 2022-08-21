@@ -1,0 +1,701 @@
+D3 Course
+Data can be used from google spread sheet
+
+We would need to increase the size of our SPG canvas or recompute all of the values in our data set
+for it to fit onto the screen.
+This is why we need scales.
+In D3 according to Mike Bostock, one of the creators of these three scales of functions that
+map from an input domain to an output range.
+The domain here corresponds to the raw data that we want to put into the scale, and the range corresponds
+to the value that we want to get out of the scale.
+
+scaleLinear
+
+const y = d3.scaleLinear()
+// original values min and max
+    .domain([0, 828])
+// canvas size min and max
+    .range([0, 400])
+
+const rects = svg.selectAll("rect")
+    .data(data)
+  
+  rects.enter().append("rect")
+    .attr("y", 0)
+    .attr("x", (d, i) => (i * 60))
+    .attr("width", 40)
+    .attr("height", d => y(d.height))
+    .attr("fill", "grey")
+
+
+
+
+Put image  here
+
+Y(100) – returns scaled value – domain -> scaled = 48.3
+y.invert(48.3) – return domain or origin value when rect is 48.3 pixels
+
+Log Scales
+
+// put image here
+
+const x = d3.scaleLog()
+    .base(10)
+    .range([0, WIDTH])
+    .domain([142, 150000])
+	
+
+A log scale with a base of one actually works out to be the exact same as a linear scale.
+Something to note here is that the domain for log scale needs to be either strictly positive or strictly
+negative because the log of zero is always undefined.
+If you try to make a log scale in D3 that contains zero in its domain, then the scale won't work.
+
+
+Time scale:
+
+//Put image here
+
+time scale is actually a type of linear scale in D3, but this domain works with JavaScript data objects instead of integers.
+
+It shouldn't surprise you that the syntax here is identical to a linear scale as the time scale is just
+a special version of it that deals with dates.
+
+
+Ordinal scales:
+
+//Put image here
+
+Ordinal scales , which you'll frequently be using whenever
+you want to use color in your visualizations.
+For this, we need to use an ordinal scale will pretty much only use this type of scale when we want
+to associate different categories with different colors.
+But it can also be used to associate any two strings with each other for an ordinal scale.
+For example, if we put Africa into the scale, it spits out red because that both are index zero in
+their array.
+And if we put Asia into this array, it will spit out blue because they're both the index for in that
+array.
+If we use an ordinal scale on something that isn't in the domain, then D3 adds this value to our domain
+and associates it with the next available range value.
+So in this case, putting Antarctica into a scale will add it to the domain and associates it with the
+color gray.
+If we try to insert Pangaea as well, then our scale doesn't have a free value that it can use from
+the range.
+So it loops back and assigns the value at index zero, which is red.
+There's no invert method that can be used for an ordinal scale because it's possible for multiple domain
+values to map to the same range value.
+
+
+Band scales:
+
+// put image here
+
+If we wanted to add in another building to our data, giving us the sixth tallest building as well,
+then we need to resize and reposition our rectangles or make our SPG wider.
+We'll be using a bend scale to do this, which will be the last scale that you'll need to know for this
+course.
+
+If we use padding in a value of zero, there'll be no space between any of the bars.
+If we use padding out of a value of zero, there'll be no padding between the first and last bars and
+the edge of the SPG canvas.
+
+So if we try to call in a value that doesn't exist in the domain, the scale will just return undefined.
+
+
+
+const x = d3.scaleBand()
+    .domain(["Burj Khalifa", "Shanghai Tower", 
+      "Abraj Al-Bait Clock Tower", "Ping An Finance Centre", 
+      "Lotte World Tower", "One World Trade Center",
+      "CTF Finance Centre"])
+    .range([0, 400])
+    .paddingInner(0.3)
+    .paddingOuter(0.2)
+  
+  const y = d3.scaleLinear()
+    .domain([0, 828])
+    .range([0, 400])
+
+  const rects = svg.selectAll("rect")
+    .data(data)
+  
+  rects.enter().append("rect")
+    .attr("y", 0)
+    // d - item in array
+    // i - index in array
+    // function runs on every value in array
+
+    .attr("x", (d) => x(d.name))
+    .attr("width", x.bandwidth)
+    .attr("height", d => y(d.height))
+    .attr("fill", "grey")
+
+
+
+
+D3 functions
+D3.min, d3.max, d3.extent (היקף)
+
+put image here
+
+if we provide
+the extent function with the same two arguments, it'll return an array for the minimum and maximum
+values.
+
+Question 1:
+You want to make the following chart in D3 with a width of 800px, and a height of 500px. Which of these scales will you need to use for your y-axis?
+
+const y = d3.scaleLinear()
+    .domain([0, 6342])
+    .range([0, 500])
+
+
+Question 2:
+You want to make the following chart in D3 with a width of 800px, and a height of 500px. Which of these scales will you need to use for your x-axis?
+
+const x = d3.scaleBand()
+    .domain([‘a’, ‘b, ‘c’, ‘d’, ‘e’, ‘f’])
+    .range([0, 800])
+    .paddingInner(0.1)
+
+Question 3:
+You want to make the following chart in D3 with a width of 800px, and a height of 500px. Which of these lines could you use to set the domain of your y-scale?
+
+y.domain([
+        0, 
+        d3.max(data, d => d.value)
+    ])
+
+
+Question 4:
+You want to make the following chart in D3 with a width of 800px, and a height of 500px. Which of these lines could you use to set the domain of your x-scale?
+
+.domain(data.map(d => d.letter))
+
+ 
+
+SVG Groups
+
+// Put image here
+
+which are a type of invisible SVG element, the
+grouping of other species together, which will be using to make our visualization conform with the
+D3 Margined Convention
+For instance, we can use a translation to move the entire group 200 pixels to the right.
+We apply a transformation with the group's transform attributes, which takes a function for a translation.
+The function takes an X and Y value, which expresses how far the group should be shifted in the positive
+direction on a canvas.
+
+
+
+
+const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 100 }
+const WIDTH = 600 - MARGIN.LEFT - MARGIN.RIGHT
+const HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM
+
+const svg = d3.select("#chart-area").append("svg")
+  .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+  .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+
+const g = svg.append("g")
+  .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`)
+
+d3.json("data/buildings.json").then(data => {
+  data.forEach(d => {
+    d.height = Number(d.height)
+  })
+
+  const x = d3.scaleBand()
+    .domain(data.map(d => d.name))
+    .range([0, WIDTH])
+    .paddingInner(0.3)
+    .paddingOuter(0.2)
+  
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.height)])
+    .range([0, HEIGHT])
+
+  const rects = g.selectAll("rect")
+    .data(data)
+  
+  rects.enter().append("rect")
+    .attr("y", 0)
+    .attr("x", (d) => x(d.name))
+    .attr("width", x.bandwidth)
+    .attr("height", d => y(d.height))
+    .attr("fill", "grey")
+})
+
+
+Axis
+// put image here
+
+const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 130 }
+const WIDTH = 600 - MARGIN.LEFT - MARGIN.RIGHT
+const HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM
+
+const svg = d3.select("#chart-area").append("svg")
+  .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+  .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+
+const g = svg.append("g")
+  .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`)
+
+// X label
+g.append("text")
+  .attr("class", "x axis-label")
+  .attr("x", WIDTH / 2)
+  .attr("y", HEIGHT + 110)
+  .attr("font-size", "20px")
+  .attr("text-anchor", "middle")
+  .text("The word's tallest buildings")
+
+// Y label
+g.append("text")
+  .attr("class", "y axis-label")
+  .attr("x", - (HEIGHT / 2))
+  .attr("y", -60)
+  .attr("font-size", "20px")
+  .attr("text-anchor", "middle")
+  .attr("transform", "rotate(-90)")
+  .text("Height (m)")
+
+d3.json("data/buildings.json").then(data => {
+  data.forEach(d => {
+    d.height = Number(d.height)
+  })
+
+  const x = d3.scaleBand()
+    .domain(data.map(d => d.name))
+    .range([0, WIDTH])
+    .paddingInner(0.3)
+    .paddingOuter(0.2)
+  
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.height)])
+    .range([0, HEIGHT])
+
+  const xAxisCall = d3.axisBottom(x)
+  g.append("g")
+    .attr("class", "x axis")
+    .attr("transform", `translate(0, ${HEIGHT})`)
+    .call(xAxisCall)
+    .selectAll("text")
+      .attr("y", "10")
+      .attr("x", "-5")
+      .attr("text-anchor", "end")
+      .attr("transform", "rotate(-40)")
+
+  const yAxisCall = d3.axisLeft(y)
+    .ticks(3)
+    .tickFormat(d => d + "m")
+  g.append("g")
+    .attr("class", "y axis")
+    .call(yAxisCall)
+
+  const rects = g.selectAll("rect")
+    .data(data)
+  
+  rects.enter().append("rect")
+    .attr("y", 0)
+    .attr("x", (d) => x(d.name))
+    .attr("width", x.bandwidth)
+    .attr("height", d => y(d.height))
+    .attr("fill", "grey")
+})
+
+
+
+SVG Coordinate system
+
+Right side bars ()
+
+// put  image here
+
+<div class="container">
+        <div class="row">
+            <div id="chart-area"></div>
+        </div>
+    </div>
+
+
+/*
+*    main.js
+*    Mastering Data Visualization with D3.js
+*    3.11 - Making a bar chart
+*    Updated by Lena
+*/
+
+const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 130 }
+const WIDTH = 600 - MARGIN.LEFT - MARGIN.RIGHT
+const HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM
+
+const svg = d3.select("#chart-area").append("svg")
+  .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
+  .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+
+const g = svg.append("g")
+  .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`)
+
+// X label
+g.append("text")
+  .attr("class", "x axis-label")
+  .attr("x", WIDTH / 2)
+  .attr("y", HEIGHT + 110)
+  .attr("font-size", "20px")
+  .attr("text-anchor", "middle")
+  .text("The word's tallest buildings")
+
+// Y label
+g.append("text")
+  .attr("class", "y axis-label")
+  .attr("x", - (HEIGHT / 2))
+  .attr("y", -60)
+  .attr("font-size", "20px")
+  .attr("text-anchor", "middle")
+  .attr("transform", "rotate(-90)")
+  .text("Height (m)")
+
+d3.json("data/buildings.json").then(data => {
+  data.forEach(d => {
+    d.height = Number(d.height)
+  })
+
+  const x = d3.scaleBand()
+    .domain(data.map(d => d.name))
+    .range([0, WIDTH])
+    .paddingInner(0.3)
+    .paddingOuter(0.2)
+  
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.height)])
+    .range([HEIGHT, 0])
+
+  const xAxisCall = d3.axisBottom(x)
+  g.append("g")
+    .attr("class", "x axis")
+    .attr("transform", `translate(0, ${HEIGHT})`)
+    .call(xAxisCall)
+    .selectAll("text")
+      .attr("y", "10")
+      .attr("x", "-5")
+      .attr("text-anchor", "end")
+      .attr("transform", "rotate(-40)")
+
+  const yAxisCall = d3.axisLeft(y)
+    .ticks(3)
+    .tickFormat(d => d + "m")
+  g.append("g")
+    .attr("class", "y axis")
+    .call(yAxisCall)
+
+  const rects = g.selectAll("rect")
+    .data(data)
+  
+  rects.enter().append("rect")
+    .attr("y", d => y(d.height))
+    .attr("x", (d) => x(d.name))
+    .attr("width", x.bandwidth)
+    .attr("height", d => HEIGHT - y(d.height))
+    .attr("fill", "grey")
+})
+
+
+D3 continue
+
+// Put image here (enter, ….)
+
+const rects = g.selectAll("rect")
+    .data(data)
+console.log(rects)
+
+Before apending
+ 
+
+Enter
+enter represents all of the elements that are in our
+data array but don't exist on the page, These are the shapes that need to be entered onto the screen.
+
+We're using the virtual selector enter here to get all of the rectangles that exist in our data, but
+not on our screen.
+Exit 
+Exit represents all of the elements that are on the page but don't exist in our data array.
+These are the elements that need to be removed from the screen
+
+
+Group
+groups is representing all of the
+elements that currently exist on the screen
+
+
+
+// Put image here
+
+// JOIN new data with old elements.
+  const rects = g.selectAll("rect")
+    .data(data)
+
+  // EXIT old elements not present in new data.
+  rects.exit().remove()
+
+  // UPDATE old elements present in new data.
+  rects
+    .attr("y", d => y(d.revenue))
+    .attr("x", (d) => x(d.month))
+    .attr("width", x.bandwidth)
+    .attr("height", d => HEIGHT - y(d.revenue))
+
+  // ENTER new elements present in new data.  
+  rects.enter().append("rect")
+    .attr("y", d => y(d.revenue))
+    .attr("x", (d) => x(d.month))
+    .attr("width", x.bandwidth)
+    .attr("height", d => HEIGHT - y(d.revenue))
+    .attr("fill", "grey")
+
+
+
+
+
+
+
+
+
+
+Quiz 2:
+Question 1:
+What will the following code do?
+1.	let t = 0
+2.	d3.interval(() => {
+3.	    console.log(t)
+4.	    t++
+5.	}, 100)
+
+Answer:
+Count up from 0 to infinity, logging a new number every 1/10 of a second.
+
+Question 2:
+You are working with the following array of data. You want to visualize each of these fruits with SVGs on the screen.
+1.	const fruits = [
+2.	    { name: "apple",  size: 50 },
+3.	    { name: "orange",  size: 70 },
+4.	    { name: "pear",  size: 40 }
+5.	]
+The array could change at any moment, so you'll be writing an update function to update their sizes as the data changes.
+Which of the following lines should you use to perform a data join  with the SVGs on the screen?
+Answer:
+const circles = g.selectAll("circle")
+    .data(fruits)
+
+Question 3:
+You are working with the following array of data. You want to visualize each of these fruits with SVGs on the screen.
+1.	const fruits = [
+2.	    { name: "apple",  size: 50 },
+3.	    { name: "orange",  size: 70 },
+4.	    { name: "pear",  size: 40 }
+5.	]
+The array could change at any moment, so you'll be writing an update function to update their sizes as the data changes.
+You already wrote this code to handle your data join...
+1.	const circles = d3.selectAll("circle")
+2.	    .data(fruits)
+Which of the following lines should you use to remove elements that no longer exist in your array of data?
+
+Answer:
+
+
+circles.exit().remove()
+
+Question 4:
+You are working with the following array of data. You want to visualize each of these fruits with SVGs on the screen.
+1.	const fruits = [
+2.	    { name: "apple",  size: 50 },
+3.	    { name: "orange",  size: 70 },
+4.	    { name: "pear",  size: 40 }
+5.	]
+The array could change at any moment, so you'll be writing an update function to update their sizes as the data changes.
+You already wrote this code to handle your data join and remove exiting elements...
+1.	const circles = d3.selectAll("circle")
+2.	    .data(fruits)
+3.	 
+4.	circles.exit().remove()
+Which of the following lines should you use to update the size of circles which have changed value?
+
+Answer:
+circles.attr(“r”, d =< d.size)
+
+Question 5:
+You are working with the following array of data. You want to visualize each of these fruits with SVGs on the screen.
+1.	const fruits = [
+2.	    { name: "apple",  size: 50 },
+3.	    { name: "orange",  size: 70 },
+4.	    { name: "pear",  size: 40 }
+5.	]
+The array could change at any moment, so you'll be writing an update function to update their sizes as the data changes.
+You already wrote this code to handle your data join, remove exiting elements, and update the circles which have changed size...
+1.	const circles = d3.selectAll("circle")
+2.	    .data(fruits)
+3.	 
+4.	circles.exit().remove()
+5.	 
+6.	circles
+7.	    .attr("r", d => d.size)
+Which of the following lines could you use to add in new circles that recently entered into our data?
+
+Answer:
+
+circles.enter().append("circle")
+    .attr(“r”, d =< d.size)
+    .attr("x", (d, i) => I * 100 + 75)
+    .attr("y", d => I *  100 + 75)
+    .attr("fill", "grey")
+
+ 
+
+Transition:
+
+const t = d3.transition().duration(750)
+
+rects.enter().append("rect")
+    .attr("fill", "grey")
+    .attr("y", y(0))
+    .attr("height", 0)
+    // AND UPDATE old elements present in new data.
+    .merge(rects)
+    .transition(t)
+      .attr("x", (d) => x(d.month))
+      .attr("width", x.bandwidth)
+      .attr("y", d => y(d[value]))
+      .attr("height", d => HEIGHT - y(d[value]))
+
+All these entry methods that we're changing before this merge call are applied to just enter selection
+and all the entry methods after the merge call will apply to both enter and update selections 
+
+Project 5.10.1 good example
+
+Formating numbers and dates
+
+// Put image here
+
+D3 Tip
+
+const g = svg.append("g")
+  .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`)
+
+let time = 0
+
+// Tooltip
+const tip = d3.tip()
+  .attr('class', 'd3-tip')
+    .html(d => {
+        let text = `<strong>Country:</strong> <span style='color:red;text-transform:capitalize'>${d.country}</span><br>`
+        text += `<strong>Continent:</strong> <span style='color:red;text-transform:capitalize'>${d.continent}</span><br>`
+        text += `<strong>Life Expectancy:</strong> <span style='color:red'>${d3.format(".2f")(d.life_exp)}</span><br>`
+        text += `<strong>GDP Per Capita:</strong> <span style='color:red'>${d3.format("$,.0f")(d.income)}</span><br>`
+        text += `<strong>Population:</strong> <span style='color:red'>${d3.format(",.0f")(d.population)}</span><br>`
+        return text
+    })
+g.call(tip)
+
+circles.enter().append("circle")
+        .attr("fill", d => continentColor(d.continent))
+        .on("mouseover", tip.show)
+        .on("mouseout", tip.hide)
+        .merge(circles)
+        .transition(t)
+            .attr("cy", d => y(d.life_exp))
+            .attr("cx", d => x(d.income))
+            .attr("r", d => Math.sqrt(area(d.population) / Math.PI))
+
+
+D3 Tip, it doesn't come included with the regular D3 library, so you'll normally need to download
+it from its repository on GitHub and include it in your JS folder.
+<link rel="stylesheet" href="css/d3-tip.css">
+<script src="js/d3-tip.js"></script>
+
+6.04 – fixed d3-tip.js
+6.05 – fixed d3-tip.js
+6.07 – fixed d3-tip.js
+
+http://127.0.0.1:5500/06/6.05/index.html
+http://127.0.0.1:5500/06/6.07/index.html
+http://127.0.0.1:5500/06/6.08/index.html
+http://127.0.0.1:5500/06/6.10.1/index.html
+
+Line
+
+// line path generator
+const line = d3.line()
+    .x(d => x(d.year))
+    .y(d => y(d.value))
+
+
+D3 components:
+https://bl.ocks.org/ - Search for community d3 components
+https://observablehq.com/@d3/gallery
+https://observablehq.com/@lena-badinter
+https://observablehq.com/search?query=map&onlyOwner=false
+
+My fixed piechart
+http://127.0.0.1:5500/06/6.10.1/piechart.html
+
+Layout
+
+http://127.0.0.1:5500/07/7.04/index.html
+
+Survey 3:
+Question 1:
+What is a layout in D3?
+Answer:
+A layout is function that takes in an array of data, and spits out a transformed version of that array, adding in new fields, which we can use to create a visualization.
+
+
+
+
+
+Question 2:
+Which of these arrays of data could we feed into the stack()  layout?
+Answer:
+var layers = [
+{
+	“name”: “apples”,
+	“values”: [
+		{“x”: 0, “y”: 91},
+		{“x”: 1, “y”: 290}
+	  ]
+},
+{
+	“name”: “oranges”,
+	“values”: [
+		{“x”: 0, “y”: 9},
+		{“x”: 1, “y”: 49}
+	  ]
+}
+]
+
+Question 3:
+When might we want to structure our data as an array of objects?
+Answer:
+When we want to perform some kind of operation on every item in our data, by using a forEach loop.
+
+ 
+
+
+
+
+D3 Forces
+Quiz
+
+Question 1:
+What is wrong with this visualization from a design perspective?
+
+There is a lie factor in the graph, because large states in the middle of the US have a smaller number of delegates in the electoral college.
+
+Question 2:
+ 
+
+Question 3:
+What can the D3 force layout not be used for?
+ 
+
+ 
+
+
