@@ -18,6 +18,27 @@ let timeline
 const parseTime = d3.timeParse("%d/%m/%Y")
 const formatTime = d3.timeFormat("%d/%m/%Y")
 
+function groupBy(keyFunction, data) {
+    var groups = {};
+    data.forEach(function(el) {
+        var key = keyFunction(el);
+        if (key in groups == false) {
+            groups[key] = [];
+        }
+        groups[key].push(el);
+    });
+    return Object.keys(groups).map(function(key) {
+        return {
+            key: key,
+            values: groups[key]
+        };
+    });
+};
+
+function getKey(el) {
+    return el.category;
+}
+
 d3.json("data/calls.json").then(data => {    
 	data.forEach(d => {
 		d.call_revenue = Number(d.call_revenue)
@@ -29,9 +50,17 @@ d3.json("data/calls.json").then(data => {
 	allCalls = data
 	calls = data
 
-	nestedCalls = d3.nest()
-		.key(d => d.category)
-		.entries(calls)
+	// nestedCalls = d3.nest()
+	// 	.key(d => d.category)
+	// 	.entries(calls)
+
+		// var regionsByFruit = d3.nest()
+            //     .key(function (d) { return d.fruit; })
+            //     .entries(data)
+            //     .reverse();
+
+            //var regionsByFruit = d3.rollup(data, v => v, d => d.fruit);
+        nestedCalls = groupBy(getKey, data)
 
 	donut = new DonutChart("#company-size")
 	revenueBar = new BarChart("#revenue", "call_revenue", "Average call revenue (USD)")
@@ -46,8 +75,9 @@ $("#var-select").on("change", () => {
 	timeline.wrangleData()
 })
 
-function brushed() {
-	const selection = d3.event.selection || timeline.x.range()
+function brushed(event) {
+	// debugger;
+	const selection = event.selection || timeline.x.range()
 	const newValues = selection.map(timeline.x.invert)
 	changeDates(newValues)
 }
@@ -55,9 +85,11 @@ function brushed() {
 function changeDates(values) {
 	calls = allCalls.filter(d => ((d.date > values[0]) && (d.date < values[1])))
 
-	nestedCalls = d3.nest()
-		.key(d => d.category)
-		.entries(calls)
+	// nestedCalls = d3.nest()
+	// 	.key(d => d.category)
+	// 	.entries(calls)
+
+	nestedCalls = groupBy(getKey, calls)
 
 	$("#dateLabel1").text(formatTime(values[0]))
 	$("#dateLabel2").text(formatTime(values[1]))

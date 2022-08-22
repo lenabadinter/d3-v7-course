@@ -1,5 +1,9 @@
 D3 Course
-Data can be used from google spread sheet
+
+https://github.com/adamjanes/udemy-d3
+
+My fixed repository
+https://github.com/lenabadinter/d3-v7-course
 
 We would need to increase the size of our SPG canvas or recompute all of the values in our data set
 for it to fit onto the screen.
@@ -696,6 +700,14 @@ Question 3:
 What can the D3 force layout not be used for?
  
 
+git init
+git remote add origin https://github.com/lenabadinter/d3-v7-course.git
+git
+git add * or git add .
+git commit -m "D3 V7"
+git push origin HEAD:master
+
+git pull origin HEAD:master
  
 
 

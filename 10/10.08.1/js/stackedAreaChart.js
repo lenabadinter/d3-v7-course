@@ -42,10 +42,29 @@ class StackedAreaChart {
     vis.stack = d3.stack()
       .keys(["west", "south", "northeast", "midwest"])
 
+    // vis.area = d3.area()
+    //   .x(d => vis.x(parseTime(d.data.date)))
+    //   .y0(d => vis.y(d[0]))
+    //   .y1(d => vis.y(d[1]))
+    //   debugger;
+
     vis.area = d3.area()
-      .x(d => vis.x(parseTime(d.data.date)))
-      .y0(d => vis.y(d[0]))
-      .y1(d => vis.y(d[1]))
+      .x(d => {
+        var xxx1 = vis.x(parseTime(d.data.date));
+        // debugger;
+        return vis.x(parseTime(d.data.date));
+      })
+      .y0(d => {
+        var xxx2 = vis.y(d[0]);
+        // debugger;
+        return vis.y(d[0]);
+      })
+      .y1(d => {
+        var xxx3 = vis.y(d[1]);
+        // debugger;
+        return vis.y(d[1]);
+      })
+      // debugger;
 
     vis.addLegend()
 
@@ -57,22 +76,24 @@ class StackedAreaChart {
     const vis = this
 
     vis.variable = $("#var-select").val()
-    vis.dayNest = d3.nest()
-      .key(d => formatTime(d.date))
-      .entries(calls)
+    // vis.dayNest = d3.nest()
+    //   .key(d => formatTime(d.date))
+    //   .entries(calls)
+    vis.dayNest = vis.groupBy(vis.getKey, calls)
+    // debugger;
 
     vis.dataFiltered = vis.dayNest
       .map(day => day.values.reduce(
         (accumulator, current) => {
-            accumulator.date = day.key
-            accumulator[current.team] = accumulator[current.team] + current[vis.variable]
-            return accumulator
+          accumulator.date = day.key
+          accumulator[current.team] = accumulator[current.team] + current[vis.variable]
+          return accumulator
         }, {
-          "northeast": 0,
-          "midwest": 0,
-          "south": 0,
-          "west": 0
-        }
+        "northeast": 0,
+        "midwest": 0,
+        "south": 0,
+        "west": 0
+      }
       ))
 
     vis.updateVis()
@@ -84,7 +105,7 @@ class StackedAreaChart {
     vis.t = d3.transition().duration(750)
 
     vis.maxDateVal = d3.max(vis.dataFiltered, d => {
-      var vals = d3.keys(d).map(key => key !== 'date' ? d[key] : 0)
+      var vals = Object.keys(d).map(key => key !== 'date' ? d[key] : 0)
       return d3.sum(vals)
     })
 
@@ -100,7 +121,7 @@ class StackedAreaChart {
 
     vis.teams = vis.g.selectAll(".team")
       .data(vis.stack(vis.dataFiltered))
-    
+
     // update the path for each team
     vis.teams.select(".area")
       .attr("d", vis.area)
@@ -108,10 +129,14 @@ class StackedAreaChart {
     vis.teams.enter().append("g")
       .attr("class", d => `team ${d.key}`)
       .append("path")
-        .attr("class", "area")
-        .attr("d", vis.area)
-        .style("fill", d => vis.color(d.key))
-        .style("fill-opacity", 0.5)
+      .attr("class", "area")
+      .attr("d", vis.area)
+      // .attr("d", d => {
+      //   debugger;
+      //   return vis.area
+      // })
+      .style("fill", d => vis.color(d.key))
+      .style("fill-opacity", 0.5)
   }
 
   addLegend() {
@@ -124,15 +149,15 @@ class StackedAreaChart {
       { label: "Northeast", color: vis.color("northeast") },
       { label: "West", color: vis.color("west") },
       { label: "South", color: vis.color("south") },
-      { label: "Midwest", color: vis.color("midwest" )}
+      { label: "Midwest", color: vis.color("midwest") }
     ]
 
     const legendCol = legend.selectAll(".legendCol")
       .data(legendArray)
       .enter().append("g")
-        .attr("class", "legendCol")
-        .attr("transform", (d, i) => `translate(${i * 150}, 0)`)
-        
+      .attr("class", "legendCol")
+      .attr("transform", (d, i) => `translate(${i * 150}, 0)`)
+
     legendCol.append("rect")
       .attr("class", "legendRect")
       .attr("width", 10)
@@ -146,5 +171,27 @@ class StackedAreaChart {
       .attr("y", 10)
       .attr("text-anchor", "start")
       .text(d => d.label)
+  }
+
+  groupBy(keyFunction, data) {
+    var groups = {};
+    data.forEach(function (el) {
+      var key = keyFunction(el);
+      if (key in groups == false) {
+        groups[key] = [];
+      }
+      groups[key].push(el);
+    });
+    return Object.keys(groups).map(function (key) {
+      return {
+        key: key,
+        values: groups[key]
+      };
+    });
+  };
+
+  getKey(el) {
+    // return el.company_size;
+    return formatTime(el.date)
   }
 }
