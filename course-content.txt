@@ -708,6 +708,19 @@ git commit -m "D3 V7"
 git push origin HEAD:master
 
 git pull origin HEAD:master
+
+https://github.com/lenabadinter/d3-v7-course.git
+
+git init
+git remote add origin https://github.com/lenabadinter/d3-v7-course.git
+git
+git add *
+git commit -m "D3 V7"
+git push origin HEAD:master
+
+git pull origin HEAD:master
+
+git push origin master --force
  
 
 
